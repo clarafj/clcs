@@ -50,8 +50,8 @@ bool IsUpValid(int path, int r, int c) {
   //     the upper point is not on the path (i.e., not crossing the path).
 
   return AB[r - 1][c] == val && 
-    !(c >= starts[path][r] && c <= ends[path][r] && 
-      !(c >= starts[path][r - 1] && c <= ends[path][r - 1]));
+    !(c >= starts[bds[path][1]][r] && c <= ends[bds[path][1]][r] && 
+      !(c >= starts[bds[path][1]][r - 1] && c <= ends[bds[path][1]][r - 1]));
 
 }
 
@@ -64,8 +64,8 @@ bool IsLeftValid(int path, int r, int c) {
   //     the left point is not on the path (i.e., not crossing the path).
 
   return AB[r][c - 1] == val && 
-    !(c >= starts[path][r] && c <= ends[path][r] && 
-      !((c - 1) >= starts[path][r] && (c - 1) <= ends[path][r]));
+    !(c >= starts[bds[path][0]][r] && c <= ends[bds[path][0]][r] && 
+      !((c - 1) >= starts[bds[path][0]][r] && (c - 1) <= ends[bds[path][0]][r]));
 
 }
 
@@ -73,10 +73,10 @@ void BackTrace(int path) {
 
   int r = path + A.length();
   int c = B.length();
-  int val = AB[path + A.length()][B.length()];
-
-  starts[path][path + A.length()] = B.length();
-  ends[path][path + A.length()] = B.length();
+  int val = AB[r][c];
+  starts[path][r] = c;
+  ends[path][r] = c;
+  int num_diags = 0;
 
   while (r != path && c != 0) {
 
@@ -91,6 +91,7 @@ void BackTrace(int path) {
 
       c--;
       starts[path][r] = c;
+      // 
 
     } else if (AB[r - 1][c - 1] == val - 1) {
 
@@ -98,10 +99,14 @@ void BackTrace(int path) {
       c--;
       starts[path][r] = c;
       ends[path][r] = c;
+      diags++;
 
     } else cerr << "BACKTRACE CHECKS OR ARRAY FILLING INCORRECT" << endl;
 
   }
+
+  // If number of diagonals in the backtrace is greater, update the CLCS.
+  if (num_diags > curr_clcs) curr_clcs = num_diags;
 
 }
 
@@ -110,16 +115,23 @@ void InitPathBounds() {
 }
 
 int main() {
-  int num_test_case_idx;
-  cin >> num_test_case_idx;
-  for (int case_idx = 0; case_idx < num_test_case_idxs; case_idx++) {
 
-    InitPathBounds();
-    curr_clcs = 0;
 
-    cin >> A >> B;
-    cout << LCS() << endl;
-  }
   return 0;
+
 }
+
+// int main() {
+//   int num_test_case_idx;
+//   cin >> num_test_case_idx;
+//   for (int case_idx = 0; case_idx < num_test_case_idxs; case_idx++) {
+
+//     InitPathBounds();
+//     curr_clcs = 0;
+
+//     cin >> A >> B;
+//     cout << LCS() << endl;
+//   }
+//   return 0;
+// }
 
