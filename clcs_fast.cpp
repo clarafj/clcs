@@ -43,13 +43,31 @@ int LCS() {
 
 bool IsUpValid(int path, int r, int c) {
 
-  return AB[r - 1][c] == val && !()
+  // Conditions on current point:
+  //
+  // 1. Not at the top of the subproblem array.
+  // 2. The upper point has the same value as the current point.
+  // 3. It is not true that the current point is not on the path, but 
+  //     the upper point is not on the path.
+
+  return r > path && AB[r - 1][c] == val && 
+    !(c >= starts[path][r] && c <= ends[path][r] && 
+      !(c >= starts[path][r - 1] && c <= ends[path][r - 1]));
 
 }
 
 bool IsLeftValid(int path, int r, int c) {
 
+  // Conditions on current point:
+  //
+  // 1. Not at the leftmost edge of the subproblem array.
+  // 2. The left point has the same value as the current point.
+  // 3. It is not true that the current point is not on the path, but 
+  //     the left point is not on the path.
 
+  return c > 0 && AB[r][c - 1] == val && 
+    !(c >= starts[path][r] && c <= ends[path][r] && 
+      !((c - 1) >= starts[path][r] && (c - 1) <= ends[path][r]));
 
 }
 
@@ -79,7 +97,7 @@ void BackTrace(int path, int r_end, int c_end) {
 
 
     // check boundaries
-    // check which direction to go, prioritize up first then left, otherwise diag
+    // check which direction to go, otherwise diag
     // if hit top of subproblem array, decrement left
     // if hit left of subproblem array, decrement up
 
