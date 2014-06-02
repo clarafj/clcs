@@ -46,8 +46,9 @@ bool IsUpValid(int path, int r, int c) {
   // Conditions on current point:
   //
   // 1. The upper point has the same value as the current point.
-  // 2. It is not true that the current point is not on the path, but 
-  //     the upper point is not on the path (i.e., not crossing the path).
+  // 2. It is not true that the current point is not on the upper boundary path, but 
+  //     the upper point is not on the upper boundary path 
+  //     (i.e., not crossing the upper boundary path).
 
   return AB[r - 1][c] == val && 
     !(c >= starts[bds[path][1]][r] && c <= ends[bds[path][1]][r] && 
@@ -60,8 +61,9 @@ bool IsLeftValid(int path, int r, int c) {
   // Conditions on current point:
   //
   // 1. The left point has the same value as the current point.
-  // 2. It is not true that the current point is not on the path, but 
-  //     the left point is not on the path (i.e., not crossing the path).
+  // 2. It is not true that the current point is not on the lower boundary path, but 
+  //     the left point is not on the lower boundary path 
+  //     (i.e., not crossing the lower boundary path).
 
   return AB[r][c - 1] == val && 
     !(c >= starts[bds[path][0]][r] && c <= ends[bds[path][0]][r] && 
@@ -80,7 +82,7 @@ void BackTrace(int path) {
 
   while (r != path && c != 0) {
 
-    if (r == path) c--;
+    if (r == path) c--; 
     else if (c == 0) r--;
     else if (IsUpValid(path, r, c)) {
 
@@ -91,7 +93,8 @@ void BackTrace(int path) {
 
       c--;
       starts[path][r] = c;
-      // 
+      // WHAT IF THE CURRENT ROW IS LESS THAN THE PATH INDEX OF THE LOWER BOUND PATH
+      // I.E. HOW TO FILL IN STARTS/ENDS FOR ROW INDICES LESS THAN THE CURRENT PATH
 
     } else if (AB[r - 1][c - 1] == val - 1) {
 
