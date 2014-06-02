@@ -45,12 +45,11 @@ bool IsUpValid(int path, int r, int c) {
 
   // Conditions on current point:
   //
-  // 1. Not at the top of the subproblem array.
-  // 2. The upper point has the same value as the current point.
-  // 3. It is not true that the current point is not on the path, but 
-  //     the upper point is not on the path.
+  // 1. The upper point has the same value as the current point.
+  // 2. It is not true that the current point is not on the path, but 
+  //     the upper point is not on the path (i.e., not crossing the path).
 
-  return r > path && AB[r - 1][c] == val && 
+  return AB[r - 1][c] == val && 
     !(c >= starts[path][r] && c <= ends[path][r] && 
       !(c >= starts[path][r - 1] && c <= ends[path][r - 1]));
 
@@ -60,54 +59,49 @@ bool IsLeftValid(int path, int r, int c) {
 
   // Conditions on current point:
   //
-  // 1. Not at the leftmost edge of the subproblem array.
-  // 2. The left point has the same value as the current point.
-  // 3. It is not true that the current point is not on the path, but 
-  //     the left point is not on the path.
+  // 1. The left point has the same value as the current point.
+  // 2. It is not true that the current point is not on the path, but 
+  //     the left point is not on the path (i.e., not crossing the path).
 
-  return c > 0 && AB[r][c - 1] == val && 
+  return AB[r][c - 1] == val && 
     !(c >= starts[path][r] && c <= ends[path][r] && 
       !((c - 1) >= starts[path][r] && (c - 1) <= ends[path][r]));
 
 }
 
-void BackTrace(int path, int r_end, int c_end) {
+void BackTrace(int path) {
 
-  int r = r_end;
-  int c = c_end;
-  int val = AB[r_end][c_end];
+  int r = path + A.length();
+  int c = B.length();
+  int val = AB[path + A.length()][B.length()];
 
-  while (r != r_end - A.length() && c != c_end - B.length()) {
+  starts[path][path + A.length()] = B.length();
+  ends[path][path + A.length()] = B.length();
 
-    // BE CAREFUL ABOUT DIAGONALS DEPENDING ON WHETHER CHECKING 
-    // UPPER BOUND OR LOWER BOUND
+  while (r != path && c != 0) {
 
-    if (IsUpValid(path, r, c)) {
+    if (r == path) c--;
+    else if (c == 0) r--;
+    else if (IsUpValid(path, r, c)) {
+
+      r--;
+      ends[path][r] = c;
 
     } else if (IsLeftValid(path, r, c)) {
 
-    } else {
-      // go diagonal
-    }
+      c--;
+      starts[path][r] = c;
+
+    } else if (AB[r - 1][c - 1] == val - 1) {
+
+      r--;
+      c--;
+      starts[path][r] = c;
+      ends[path][r] = c;
+
+    } else cerr << "BACKTRACE CHECKS OR ARRAY FILLING INCORRECT" << endl;
 
   }
-
-
-
-
-
-    // check boundaries
-    // check which direction to go, otherwise diag
-    // if hit top of subproblem array, decrement left
-    // if hit left of subproblem array, decrement up
-
-    // if (n == stopx) m--;
-    //  else if (arr[m][n - 1] == init) n--;
-    //  else if (arr[m - 1][n] == init) m--;
-    //  else {
-    //    m--; n--;
-    //  }
-    // }
 
 }
 
