@@ -1,6 +1,8 @@
 /* File: clcs_fast.cpp
  * Date: 06/01/14
- * -------------------
+ * Clara Fannjiang (clarafj, 05787501)
+ * John Louie (jwlouie, 0581386)
+ * ------------------------------
  * oh CS 161
  * it rhymes with fun boba run
  * but it is not fun
@@ -9,6 +11,7 @@
 #include <algorithm>
 #include <iostream>
 #include <string>
+#include <vector>
 
 using namespace std;
 
@@ -16,10 +19,14 @@ using namespace std;
 const int MAX_WORD_LEN = 2048;
 
 // Global arrays.
-int AB[2 * MAX_WORD_LEN][MAX_WORD_LEN];
-int starts[MAX_WORD_LEN][MAX_WORD_LEN];
-int ends[MAX_WORD_LEN][MAX_WORD_LEN];
-int bds[MAX_WORD_LEN][2];
+vector< vector<int> > AAB;
+vector< vector<int> > starts;
+vector< vector<int> > finish;
+// NOTE: "ends" was ambiguous because it is a function for 
+//    other things (i.e. string manipulations)
+// 0-th entry gives the lower bound path index; 1-st entry
+// gives the upper bound path index.
+vector< vector<int> > bds;
 int curr_clcs;
 
 string A, B;
@@ -27,21 +34,20 @@ string A, B;
 int LCS() {
   int m = A.length(), n = B.length();
   int i, j;
-  for (i = 0; i <= m; i++) AB[i][0] = 0;
-  for (j = 0; j <= n; j++) AB[0][j] = 0;
+  for (i = 0; i <= m; i++) AAB[i][0] = 0;
+  for (j = 0; j <= n; j++) AAB[0][j] = 0;
   
   for (i = 1; i <= m; i++) {
     for (j = 1; j <= n; j++) {
-      AB[i][j] = max(AB[i-1][j], AB[i][j-1]);
-      if (A[i-1] == B[j-1]) AB[i][j] = max(AB[i][j], AB[i-1][j-1]+1);
+      AAB[i][j] = max(AAB[i-1][j], AAB[i][j-1]);
+      if (A[i-1] == B[j-1]) AAB[i][j] = max(AAB[i][j], AAB[i-1][j-1]+1);
     }
   }
   
-  return AB[m][n];
-
+  return AAB[m][n];
 }
 
-bool IsUpValid(int path, int r, int c) {
+bool IsUpValid(int path, int val, int r, int c) {
 
   // Conditions on current point:
   //
@@ -50,13 +56,13 @@ bool IsUpValid(int path, int r, int c) {
   //     the upper point is not on the upper boundary path 
   //     (i.e., not crossing the upper boundary path).
 
-  return AB[r - 1][c] == val && 
-    !(c >= starts[bds[path][1]][r] && c <= ends[bds[path][1]][r] && 
-      !(c >= starts[bds[path][1]][r - 1] && c <= ends[bds[path][1]][r - 1]));
+  return AAB[r - 1][c] == val &&
+    !(c >= starts[bds[path][1]][r] && c <= finish[bds[path][1]][r] && 
+      !(c >= starts[bds[path][1]][r - 1] && c <= finish[bds[path][1]][r - 1]));
 
 }
 
-bool IsLeftValid(int path, int r, int c) {
+bool IsLeftValid(int path, int val, int r, int c) {
 
   // Conditions on current point:
   //
@@ -65,9 +71,9 @@ bool IsLeftValid(int path, int r, int c) {
   //     the left point is not on the lower boundary path 
   //     (i.e., not crossing the lower boundary path).
 
-  return AB[r][c - 1] == val && 
-    !(c >= starts[bds[path][0]][r] && c <= ends[bds[path][0]][r] && 
-      !((c - 1) >= starts[bds[path][0]][r] && (c - 1) <= ends[bds[path][0]][r]));
+  return AAB[r][c - 1] == val && 
+    !(c >= starts[bds[path][0]][r] && c <= finish[bds[path][0]][r] && 
+      !((c - 1) >= starts[bds[path][0]][r] && (c - 1) <= finish[bds[path][0]][r]));
 
 }
 
@@ -75,34 +81,34 @@ void BackTrace(int path) {
 
   int r = path + A.length();
   int c = B.length();
-  int val = AB[r][c];
+  int val = AAB[r][c];
   starts[path][r] = c;
-  ends[path][r] = c;
+  finish[path][r] = c;
   int num_diags = 0;
 
   while (r != path && c != 0) {
 
     if (r == path) c--; 
     else if (c == 0) r--;
-    else if (IsUpValid(path, r, c)) {
+    else if (IsUpValid(path, val, r, c)) {
 
       r--;
-      ends[path][r] = c;
+      finish[path][r] = c;
 
-    } else if (IsLeftValid(path, r, c)) {
+    } else if (IsLeftValid(path, val, r, c)) {
 
       c--;
       starts[path][r] = c;
       // WHAT IF THE CURRENT ROW IS LESS THAN THE PATH INDEX OF THE LOWER BOUND PATH
-      // I.E. HOW TO FILL IN STARTS/ENDS FOR ROW INDICES LESS THAN THE CURRENT PATH
+      // I.E. HOW TO FILL IN STARTS/finish FOR ROW INDICES LESS THAN THE CURRENT PATH
 
-    } else if (AB[r - 1][c - 1] == val - 1) {
+    } else if (AAB[r - 1][c - 1] == val - 1) {
 
       r--;
       c--;
       starts[path][r] = c;
-      ends[path][r] = c;
-      diags++;
+      finish[path][r] = c;
+      num_diags++;
 
     } else cerr << "BACKTRACE CHECKS OR ARRAY FILLING INCORRECT" << endl;
 
@@ -113,8 +119,25 @@ void BackTrace(int path) {
 
 }
 
+void InitStartsfinish() {
+
+  AAB.resize(2 * A.length());
+  starts.resize(A.length());
+  finish.resize(A.length());
+  bds.resize(A.length());
+
+  for (int i = 0; i < A.length(); ++i) {
+    AAB[i].resize(B.length(), 0);
+    starts[i].resize(A.length(), 0);
+    finish[i].resize(A.length(), 0);
+    // Is the resize of the bds vector really necessary?
+    // bds.resize(2, 0);
+  }
+
+}
+
 void InitPathBounds() {
-  // do stuff with path_bds
+  // do stuff to path bounds
 }
 
 int main() {
@@ -128,6 +151,8 @@ int main() {
 //   int num_test_case_idx;
 //   cin >> num_test_case_idx;
 //   for (int case_idx = 0; case_idx < num_test_case_idxs; case_idx++) {
+
+//     InitStartsfinish();
 
 //     InitPathBounds();
 //     curr_clcs = 0;
