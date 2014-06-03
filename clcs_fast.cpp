@@ -24,6 +24,7 @@ vector< vector<int> > starts;
 vector< vector<int> > finish;
 // NOTE: "ends" was ambiguous because it is a function for 
 //    other things (i.e. string manipulations)
+
 // 0-th entry gives the lower bound path index; 1-st entry
 // gives the upper bound path index.
 vector< vector<int> > bds;
