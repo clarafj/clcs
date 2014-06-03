@@ -21,10 +21,14 @@ const int MAX_WORD_LEN = 2048;
 // Global arrays.
 vector< vector<int> > AAB;
 vector< vector<int> > starts;
+<<<<<<< HEAD
 vector< vector<int> > finish;
 // NOTE: "ends" was ambiguous because it is a function for 
 //    other things (i.e. string manipulations)
 
+=======
+vector< vector<int> > ends;
+>>>>>>> 7d1604a9aa5d660f9922cd538139311cacdcaf65
 // 0-th entry gives the lower bound path index; 1-st entry
 // gives the upper bound path index.
 vector< vector<int> > bds;
@@ -46,6 +50,10 @@ int LCS() {
   }
   
   return AAB[m][n];
+<<<<<<< HEAD
+=======
+
+>>>>>>> 7d1604a9aa5d660f9922cd538139311cacdcaf65
 }
 
 bool IsUpValid(int path, int val, int r, int c) {
@@ -57,9 +65,15 @@ bool IsUpValid(int path, int val, int r, int c) {
   //     the upper point is not on the upper boundary path 
   //     (i.e., not crossing the upper boundary path).
 
+<<<<<<< HEAD
   return AAB[r - 1][c] == val &&
     !(c >= starts[bds[path][1]][r] && c <= finish[bds[path][1]][r] && 
       !(c >= starts[bds[path][1]][r - 1] && c <= finish[bds[path][1]][r - 1]));
+=======
+  return AAB[r - 1][c] == val && 
+    !(c >= starts[bds[path][1]][r] && c <= ends[bds[path][1]][r] && 
+      !(c >= starts[bds[path][1]][r - 1] && c <= ends[bds[path][1]][r - 1]));
+>>>>>>> 7d1604a9aa5d660f9922cd538139311cacdcaf65
 
 }
 
@@ -73,8 +87,13 @@ bool IsLeftValid(int path, int val, int r, int c) {
   //     (i.e., not crossing the lower boundary path).
 
   return AAB[r][c - 1] == val && 
+<<<<<<< HEAD
     !(c >= starts[bds[path][0]][r] && c <= finish[bds[path][0]][r] && 
       !((c - 1) >= starts[bds[path][0]][r] && (c - 1) <= finish[bds[path][0]][r]));
+=======
+    !(c >= starts[bds[path][0]][r] && c <= ends[bds[path][0]][r] && 
+      !((c - 1) >= starts[bds[path][0]][r] && (c - 1) <= ends[bds[path][0]][r]));
+>>>>>>> 7d1604a9aa5d660f9922cd538139311cacdcaf65
 
 }
 
@@ -120,19 +139,32 @@ void BackTrace(int path) {
 
 }
 
+<<<<<<< HEAD
 void InitStartsfinish() {
 
   AAB.resize(2 * A.length());
   starts.resize(A.length());
   finish.resize(A.length());
+=======
+void InitStartsEnds() {
+
+  AAB.resize(2 * A.length());
+  starts.resize(A.length());
+  ends.resize(A.length());
+>>>>>>> 7d1604a9aa5d660f9922cd538139311cacdcaf65
   bds.resize(A.length());
 
   for (int i = 0; i < A.length(); ++i) {
     AAB[i].resize(B.length(), 0);
     starts[i].resize(A.length(), 0);
+<<<<<<< HEAD
     finish[i].resize(A.length(), 0);
     // Is the resize of the bds vector really necessary?
     // bds.resize(2, 0);
+=======
+    ends[i].resize(A.length(), 0);
+    bds.resize(2, 0);
+>>>>>>> 7d1604a9aa5d660f9922cd538139311cacdcaf65
   }
 
 }
@@ -153,7 +185,11 @@ int main() {
 //   cin >> num_test_case_idx;
 //   for (int case_idx = 0; case_idx < num_test_case_idxs; case_idx++) {
 
+<<<<<<< HEAD
 //     InitStartsfinish();
+=======
+//     InitStartsEnds();
+>>>>>>> 7d1604a9aa5d660f9922cd538139311cacdcaf65
 
 //     InitPathBounds();
 //     curr_clcs = 0;
